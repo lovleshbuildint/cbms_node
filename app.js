@@ -8,6 +8,16 @@ const cors = require('cors');
 app.use(cors());
 app.use(express.static('public'));
 
+const corsOptions = {
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+  allowedHeaders: 'Content-Type,Authorization',
+};
+
+app.use(cors(corsOptions));
+
 const connection = mysql.createPool({
   host: '3.7.158.221',
   user: 'admin_buildINT',
@@ -51,6 +61,7 @@ app.post('/login', (req, res) => {
     });
     // Update the database with the JWT token
     res.status(200).json({ "token": token, });
+    res.header('Access-Control-Allow-Origin', '*');
   });
 });
 // Verify OTP and log in
