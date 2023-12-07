@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const app = express();
 const cors = require('cors');
 app.use(cors());
+app.use(express.static('public'));
 
 const connection = mysql.createPool({
   host: '3.7.158.221',
