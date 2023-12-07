@@ -36,6 +36,24 @@ connection.getConnection((err) => {
 
 });
 
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  jwt.verify(token, "secretkey", (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    // Attach the decoded user information to the request object for later use
+    req.user = decoded;
+    next();
+  });
+};
+
 // Request an OTP for login
 app.post('/login', (req, res) => {
   const { EmailId, password } = req.body;
@@ -245,7 +263,7 @@ app.post('/mybills/datapost', (req, res) => {
 });
 //post data  in database in clientlist
 app.post('/clientlist/datapost', (req, res) => {
-  const { ClientName, NoLocation, Paid, Unpaid, DueDate } = req.body;
+  const { ClientName, NoLocation, Paid, Unpaid, DueDate } = req.body; 
 
   // Perform the database insertion
   connection.query('INSERT INTO client_list ( ClientName, NoLocation, Paid, Unpaid, DueDate) VALUES (?, ?,?, ?,?)', [ClientName, NoLocation, Paid, Unpaid, DueDate], (err, result) => {
@@ -258,16 +276,14 @@ app.post('/clientlist/datapost', (req, res) => {
   });
 });
 //fetch data from database in clientlist
-app.post('/clientlist/datas', (req, res) => {
-  const { CL_ID } = req.body; // Assuming CL_ID is sent in the request body
-
+app.post('/clientlist/datas', verifyToken, (req, res) => {
   connection.query('SELECT * FROM client_list ORDER BY CL_ID DESC', (err, rows) => {
     if (err) {
       console.error('Error executing query:', err);
       res.status(500).json({ error: 'Internal Server Error' });
       return;
     }
-    res.json(rows);
+    res.json({data: rows, user: req.user});
   });
 });
 
