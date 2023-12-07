@@ -263,7 +263,7 @@ app.post('/mybills/datapost', (req, res) => {
 });
 //post data  in database in clientlist
 app.post('/clientlist/datapost', (req, res) => {
-  const { ClientName, NoLocation, Paid, Unpaid, DueDate } = req.body;
+  const { ClientName, NoLocation, Paid, Unpaid, DueDate } = req.body; 
 
   // Perform the database insertion
   connection.query('INSERT INTO client_list ( ClientName, NoLocation, Paid, Unpaid, DueDate) VALUES (?, ?,?, ?,?)', [ClientName, NoLocation, Paid, Unpaid, DueDate], (err, result) => {
@@ -283,22 +283,25 @@ app.post('/clientlist/datas', verifyToken, (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
       return;
     }
-    res.json({ data: rows, user: req.user });
+    res.json({data: rows, user: req.user});
   });
 });
 
 app.post('/location/datas', verifyToken, (req, res) => {
-  const { CL_ID } = req.body
-  connection.query(`  SELECT * FROM mybills
-  JOIN client_list ON mybills.CL_ID = client_list.CL_ID
-  WHERE mybills.CL_ID = ?
-  ORDER BY mybills.my_b DESC`, [ CL_ID ], (err, rows) => {
+  const {CL_ID} = req.body
+  connection.query(`SELECT * FROM mybills where CL_ID=${CL_ID} ORDER BY my_b DESC`, (err, rows) => {
     if (err) {
       console.error('Error executing query:', err);
       res.status(500).json({ error: 'Internal Server Error' });
       return;
     }
-    res.json({ data: rows, user: req.user });
+    connection.query(`SELECT * FROM client_list where CL_ID=${CL_ID}`, (err, rows1) => {
+      if(err) {
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+      res.json({clientdata: rows1, data: rows, user: req.user});
+    });
+    
   });
 });
 
