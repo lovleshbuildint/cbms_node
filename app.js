@@ -61,7 +61,6 @@ app.post('/login', (req, res) => {
     });
     // Update the database with the JWT token
     res.status(200).json({ "token": token, });
-    res.header('Access-Control-Allow-Origin', '*');
   });
 });
 // Verify OTP and log in
