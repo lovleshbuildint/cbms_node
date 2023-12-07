@@ -305,6 +305,19 @@ app.post('/location/datas', verifyToken, (req, res) => {
   });
 });
 
+app.post('/update/location/datas', (req, res) => { 
+  const {BillerId, Power_Kwh,SanctionedLoad, DueDate, Amount} = req.body
+  connection.query(`UPDATE mybills set Power_Kwh = ${Power_Kwh}, SanctionedLoad = ${SanctionedLoad}, Amount = ${Amount} where BillerId = ${BillerId}`, (err, rows) => {
+    
+    if (err) {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
+      return;
+    }
+      res.json({data: rows, user: req.user});
+    });
+}); 
+
 app.listen(3200, () => {
   console.log('Server is running on port 3200');
 });
