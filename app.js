@@ -6,22 +6,22 @@ const jwt = require('jsonwebtoken');
 
 const app = express();
 const connection = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: '12345',
-  database: 'cbm',
+  host: '3.7.158.221',
+  user: 'admin_buildINT',
+  password: 'buildINT@2023$',
+  database: 'cbms',
 });
 
 app.use(express.json());
-  // Connect to the MySQL database
-  connection.getConnection((err) => {
-    if (err) {
-      console.error('Error connecting to MySQL database: ' + err.message);
-      return;
-    }
-    console.log('Connected to MySQL database');
-  
-  });
+// Connect to the MySQL database
+connection.getConnection((err) => {
+  if (err) {
+    console.error('Error connecting to MySQL database: ' + err.message);
+    return;
+  }
+  console.log('Connected to MySQL database');
+
+});
 
 // Request an OTP for login
 app.post('/login', (req, res) => {
@@ -29,34 +29,26 @@ app.post('/login', (req, res) => {
 
   // Check if the user exists
   connection.query('SELECT * FROM login WHERE EmailId = ? AND password = ?', [EmailId, password], (err, results) => {
-      if (err) {
-          console.log(err)
-          res.status(500).json({ error: 'Internal server error' });
-          return;
-      }
+    if (err) {
+      console.log(err)
+      res.status(500).json({ error: 'Internal server error' });
+      return;
+    }
 
-      if (results.length === 0) {
-          res.status(401).json({ error: 'Invalid EmailId or password' });
-          return;
-      }
+    if (results.length === 0) {
+      res.status(401).json({ error: 'Invalid EmailId or password' });
+      return;
+    }
 
-      const user = results[0];
+    const user = results[0];
 
-      // User is authenticated; generate a JWT token
-      const token = jwt.sign({ id: user.id, EmailId: user.EmailId, role_id: user.role_id }, 'secretkey', {
-          expiresIn: '1h', // Token expires in 1 hour
-      });
-        // Update the database with the JWT token
-        connection.query('UPDATE login SET token = ? WHERE EmailId = ?', [token, user.EmailId], (updateErr, updateResults) => {
-          if (updateErr) {
-              console.log(updateErr);
-              res.status(500).json({ error: 'Failed to update JWT token in the database' });
-              return;
-          }
-          
-      res.status(200).json({ "token":token, "user": user.token});
+    // User is authenticated; generate a JWT token
+    const token = jwt.sign({ EmailId: user.EmailId, role_id: user.role }, 'secretkey', {
+      expiresIn: '1h', // Token expires in 1 hour
+    });
+    // Update the database with the JWT token
+    res.status(200).json({ "token": token, });
   });
-});
 });
 // Verify OTP and log in
 app.post('/verify', (req, res) => {
@@ -76,41 +68,41 @@ app.post('/verify', (req, res) => {
       return;
     }
     const currentTime = new Date(); // get current Time
-      const otpExpiretime = new Date(results[0].expiration_time);
-      if (currentTime < otpExpiretime) {
-        // OTP is valid; generate a JWT token
-        const user = results[0];
-        const token = jwt.sign(
-          { EmailId: user.EmailId },
-          'secretkey',
-          {
-            expiresIn: '6h', // Token expires in 1 hour
-          }
-        );
+    const otpExpiretime = new Date(results[0].expiration_time);
+    if (currentTime < otpExpiretime) {
+      // OTP is valid; generate a JWT token
+      const user = results[0];
+      const token = jwt.sign(
+        { EmailId: user.EmailId },
+        'secretkey',
+        {
+          expiresIn: '6h', // Token expires in 1 hour
+        }
+      );
 
-        // Update the database with the JWT token
-        connection.query(
-          'UPDATE login SET token = ? WHERE EmailId = ?',
-          [token, EmailId],
-          (updateErr) => {
-            if (updateErr) {
-              console.error(
-                'Error updating JWT token in the database:',
-                updateErr
-              );
-              res.status(500).json({
-                error: 'Failed to update JWT token in the database',
-              });
-              return;
-            }
-
-            res.status(200).json({ token, role: results[0].role });
+      // Update the database with the JWT token
+      connection.query(
+        'UPDATE login SET token = ? WHERE EmailId = ?',
+        [token, EmailId],
+        (updateErr) => {
+          if (updateErr) {
+            console.error(
+              'Error updating JWT token in the database:',
+              updateErr
+            );
+            res.status(500).json({
+              error: 'Failed to update JWT token in the database',
+            });
+            return;
           }
-        );
-      } else {
-        res.status(200).json({ error: 'OTP has expired' });
-      }
+
+          res.status(200).json({ token, role: results[0].role });
+        }
+      );
+    } else {
+      res.status(200).json({ error: 'OTP has expired' });
     }
+  }
   );
 });
 // Request for forgot password
@@ -148,14 +140,14 @@ app.post('/forgot', (req, res) => {
         // Send the OTP to the user via email (you'll need to configure your nodemailer for this)
         const transporter = nodemailer.createTransport({
           host: 'smtp.rediffmailpro.com',
-          port: 465,  
+          port: 465,
           secure: true, // for SSL
           auth: {
             user: 'trainee.software@buildint.co',
             pass: 'BuildINT@123',
           },
         });
-        
+
 
         const mailOptions = {
           from: 'trainee.software@buildint.co',
@@ -226,8 +218,8 @@ app.post('/mybills/datas', (req, res) => {
 });
 // post data in database in mybills
 app.post('/mybills/datapost', (req, res) => {
-    const {BillerId, BillerName, Location, Power_Kwh, SanctionedLoad, DueDate, Amount, BillStatus } = req.body;
-    
+  const { BillerId, BillerName, Location, Power_Kwh, SanctionedLoad, DueDate, Amount, BillStatus } = req.body;
+
   // Perform the database insertion
   connection.query('INSERT INTO mybills ( BillerId, BillerName, Location, Power_Kwh, SanctionedLoad, DueDate, Amount, BillStatus) VALUES (?, ?,?, ?,?, ?,?, ?)', [BillerId, BillerName, Location, Power_Kwh, SanctionedLoad, DueDate, Amount, BillStatus], (err, result) => {
     if (err) {
@@ -235,22 +227,22 @@ app.post('/mybills/datapost', (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
       return;
     }
-    res.status(201).json({ message: 'Data inserted successfully'});
+    res.status(201).json({ message: 'Data inserted successfully' });
   });
 });
 //post data  in database in clientlist
 app.post('/clientlist/datapost', (req, res) => {
-  const {ClientName, NoLocation, Paid, Unpaid, DueDate} = req.body;
-  
-// Perform the database insertion
-connection.query('INSERT INTO client_list ( ClientName, NoLocation, Paid, Unpaid, DueDate) VALUES (?, ?,?, ?,?)', [ ClientName, NoLocation, Paid, Unpaid, DueDate], (err, result) => {
-  if (err) {
-    console.error('Error executing query:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
-    return;
-  }
-  res.status(201).json({ message: 'Data inserted successfully'});
-});
+  const { ClientName, NoLocation, Paid, Unpaid, DueDate } = req.body;
+
+  // Perform the database insertion
+  connection.query('INSERT INTO client_list ( ClientName, NoLocation, Paid, Unpaid, DueDate) VALUES (?, ?,?, ?,?)', [ClientName, NoLocation, Paid, Unpaid, DueDate], (err, result) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
+      return;
+    }
+    res.status(201).json({ message: 'Data inserted successfully' });
+  });
 });
 //fetch data from database in clientlist
 app.post('/clientlist/datas', (req, res) => {
