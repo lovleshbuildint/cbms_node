@@ -252,7 +252,7 @@ app.post('/mybills/datapost', (req, res) => {
   const { BillerId, BillerName, Location, Power_Kwh, SanctionedLoad, DueDate, Amount, BillStatus, CL_ID } = req.body;
 
   // Perform the database insertion
-  connection.query('INSERT INTO mybills ( BillerId, BillerName, Location, Power_Kwh, SanctionedLoad, DueDate, Amount, BillStatus, CL_ID) VALUES (?, ?,?, ?,?, ?,?, ?, ?)', [BillerId, BillerName, Location, Power_Kwh, SanctionedLoad, DueDate, Amount, BillStatus], (err, result) => {
+  connection.query('INSERT INTO mybills ( BillerId, BillerName, Location, Power_Kwh, SanctionedLoad, DueDate, Amount, BillStatus, CL_ID) VALUES (?, ?,?, ?,?, ?,?, ?, ?)', [BillerId, BillerName, Location, Power_Kwh, SanctionedLoad, DueDate, Amount, BillStatus, CL_ID], (err, result) => {
     if (err) {
       console.error('Error executing query:', err);
       res.status(500).json({ error: 'Internal Server Error' });
