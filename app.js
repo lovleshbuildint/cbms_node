@@ -74,7 +74,7 @@ app.post('/login', (req, res) => {
     const user = results[0];
 
     // User is authenticated; generate a JWT token
-    const token = jwt.sign({ EmailId: user.EmailId, role_id: user.role }, 'secretkey', {
+    const token = jwt.sign({ full_name: user.full_name, EmailId: user.EmailId, role_id: user.role }, 'secretkey', {
       expiresIn: '1h', // Token expires in 1 hour
     });
     // Update the database with the JWT token
