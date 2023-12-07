@@ -3,8 +3,10 @@ const mysql = require('mysql2');
 const randomstring = require('randomstring');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
-
 const app = express();
+const cors = require('cors');
+app.use(cors());
+
 const connection = mysql.createPool({
   host: '3.7.158.221',
   user: 'admin_buildINT',
