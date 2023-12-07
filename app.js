@@ -262,7 +262,7 @@ app.post('/clientlist/datapost', (req, res) => {
 app.post('/clientlist/datas', (req, res) => {
   const { CL_ID } = req.body; // Assuming CL_ID is sent in the request body
 
-  connection.query('SELECT * FROM client_list WHERE CL_ID = ? ORDER BY CL_ID DESC', [CL_ID], (err, rows) => {
+  connection.query('SELECT * FROM client_list ORDER BY CL_ID DESC', [CL_ID], (err, rows) => {
     if (err) {
       console.error('Error executing query:', err);
       res.status(500).json({ error: 'Internal Server Error' });
