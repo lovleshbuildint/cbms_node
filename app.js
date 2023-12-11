@@ -19,9 +19,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 const connection = mysql.createPool({
-  host: '3.7.158.221',
-  user: 'admin_buildINT',
-  password: 'buildINT@2023$',
+  host: '',
+  user: '',
+  password: '',
   database: 'cbms',
 });
 
