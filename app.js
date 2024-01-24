@@ -307,7 +307,7 @@ app.post('/location/datas', verifyToken, (req, res) => {
 
 app.post('/per/location/datas', verifyToken, (req, res) => {
   const {unique_identifier} = req.body
-  connection.query(`SELECT * FROM bill_data where unique_identifier= "${unique_identifier}" ORDER BY id DESC`, (err, rows) => {
+  connection.query(`SELECT * FROM bill_data where unique_identifier= "${unique_identifier}" ORDER BY id ASC`, (err, rows) => {
     if (err) {
       console.error('Error executing query:', err);
       res.status(500).json({ error: 'Internal Server Error' });
