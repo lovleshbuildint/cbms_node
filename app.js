@@ -277,7 +277,7 @@ app.post('/clientlist/datapost', (req, res) => {
 });
 //fetch data from database in clientlist
 app.post('/clientlist/datas', verifyToken, (req, res) => {
-  connection.query('SELECT * FROM client_list ORDER BY CL_ID DESC', (err, rows) => {
+  connection.query('SELECT * FROM client_list ORDER BY CL_ID ASC', (err, rows) => {
     if (err) {
       console.error('Error executing query:', err);
       res.status(500).json({ error: 'Internal Server Error' });
