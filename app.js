@@ -289,7 +289,7 @@ app.post('/clientlist/datas', verifyToken, (req, res) => {
 
 app.post('/location/datas', verifyToken, (req, res) => {
   const {CL_ID} = req.body
-  connection.query(`SELECT * FROM mybills where CL_ID=${CL_ID} ORDER BY my_b DESC`, (err, rows) => {
+  connection.query(`SELECT * FROM mybills where CL_ID=${CL_ID} ORDER BY my_b ASC`, (err, rows) => {
     if (err) {
       console.error('Error executing query:', err);
       res.status(500).json({ error: 'Internal Server Error' });
