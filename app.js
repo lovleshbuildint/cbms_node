@@ -74,7 +74,8 @@ app.post('/login', (req, res) => {
     const user = results[0];
 
     // User is authenticated; generate a JWT token
-    const token = jwt.sign({ full_name: user.full_name, EmailId: user.EmailId, role_id: user.role }, 'secretkey', {
+    console.log(user.CL_ID);
+    const token = jwt.sign({ full_name: user.full_name, EmailId: user.EmailId, role_id: user.role, CL_ID: user.CL_ID }, 'secretkey', {
       expiresIn: '1h', // Token expires in 1 hour
     });
     // Update the database with the JWT token
@@ -277,7 +278,8 @@ app.post('/clientlist/datapost', (req, res) => {
 });
 //fetch data from database in clientlist
 app.post('/clientlist/datas', verifyToken, (req, res) => {
-  connection.query('SELECT * FROM client_list ORDER BY CL_ID DESC', (err, rows) => {
+  console.log(req.user)
+  connection.query(`SELECT * FROM client_list where CL_ID = ${req.user.CL_ID}`, (err, rows) => {
     if (err) {
       console.error('Error executing query:', err);
       res.status(500).json({ error: 'Internal Server Error' });
